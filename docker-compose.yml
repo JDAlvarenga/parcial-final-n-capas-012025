@@ -1,0 +1,51 @@
+services:
+  db:
+    image: postgres:17
+    container_name: parcial-final-db
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: supportdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+
+    networks:
+      - parcial-final-network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: parcial-final-app
+    ports:
+      - "8080:8080"
+
+    depends_on:
+      - db
+
+    networks:
+      - parcial-final-network
+
+#    Should put on .env file
+    environment:
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DATABASE_NAME: supportdb
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: root
+      JWT_SECRET: 2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b
+      JWT_EXPIRATION_TIME: 86400000
+    volumes:
+      - ./logs:/app/logs
+
+
+networks:
+  parcial-final-network:
+    name: parcial-final-network
+
+volumes:
+  postgres_data:
